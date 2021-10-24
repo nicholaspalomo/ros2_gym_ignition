@@ -1,5 +1,7 @@
 # ROS2/Ignition Gazebo Environment for Reinforcement Learning
 
+** This is a work in progress! **
+
 This project builds upon the original [`gym-ignition` project](https://github.com/robotology/gym-ignition) started by the team at the Italian Institute of Technology and is also heavily inspired by the [`RaiSim Gym`](https://raisim.com/index.html) project from ETH Zurich. However, this gym environment makes use of ROS2 to run multiple, parallel instances of your robot in order to accelerate the training/learning of RL policies in simulation. Where possible, this project tries to adhere to an API similar to that of [OpenAI Gym](https://github.com/openai/gym).
 
 ## TL;DR
@@ -9,7 +11,7 @@ If you want to try out the project without installing all the dependencies, run 
 To build the Dockerfile, run:
 
 ```
-docker build -t gym . --build-arg SSH_KEY="$(cat /absolute/path/to/.ssh/id_rsa)"
+docker build -t gym .
 ```
 
 To launch the simulation from the Dockerfile, from a clean colcon workspace, run:
