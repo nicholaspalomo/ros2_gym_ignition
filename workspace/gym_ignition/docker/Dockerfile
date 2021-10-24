@@ -125,20 +125,20 @@ RUN cd ${DEPS_DIR} && \
 RUN pip3 --default-timeout=100 install -U \
         numpy
 
-### Add Github SSH key so that we can clone private gym_ignition repo (comment this out if public repo)
-ARG SSH_KEY
-ENV SSH_KEY=$SSH_KEY
+# ### Add Github SSH key so that we can clone private gym_ignition repo (comment this out if public repo)
+# ARG SSH_KEY
+# ENV SSH_KEY=$SSH_KEY
 
-# Make ssh dir (comment this out if public repo)
-RUN mkdir /root/.ssh/ && \
-    echo "$SSH_KEY" > /root/.ssh/id_rsa && \
-    chmod 600 /root/.ssh/id_rsa && \
-    touch /root/.ssh/known_hosts && \
-    ssh-keyscan github.com >> /root/.ssh/known_hosts
+# # Make ssh dir (comment this out if public repo)
+# RUN mkdir /root/.ssh/ && \
+#     echo "$SSH_KEY" > /root/.ssh/id_rsa && \
+#     chmod 600 /root/.ssh/id_rsa && \
+#     touch /root/.ssh/known_hosts && \
+#     ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 # Clone gym-ignition repo and install scenarIO library
 RUN cd /root/ && \
-    git clone git@github.com:nicholaspalomo/gym_ignition.git -b ${GYM_IGNITION_GIT_BRANCH} && \
+    git clone https://github.com/nicholaspalomo/ros2_gym_ignition.git -b ${GYM_IGNITION_GIT_BRANCH} && \
     cd ${GYM_IGNITION_DIR}/workspace/scenario && \
     cmake -S . -B build/ && \
     cmake --build build/ --target install -- -j2 && \
