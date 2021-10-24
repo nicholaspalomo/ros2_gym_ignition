@@ -1,0 +1,9 @@
+float64 sim_time_step
+float64 control_time_step
+---
+int32 num_obs
+int32 num_extras
+int32 num_acts
+int8 num_envs
+bool visualizable
+int8 env_id

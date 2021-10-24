@@ -1,0 +1,34 @@
+<robot name="spark_plug">
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+  <link name="spark_plug">
+    <inertial>
+    <!-- COM computed using MeshLab -->
+      <origin xyz="0.0 0.033374 0.0" />
+      <mass value="0.05" />
+      <inertia ixx="0.000266" ixy="0.0" ixz="0.0" iyy="0.000025" iyz="0.0" izz="0.000266" />
+    </inertial>
+    <visual>
+      <origin xyz="0.0 0.0 0.0"/>
+      <geometry>
+        <mesh filename="model://spark_plug/meshes/spark_plug.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.0"/>
+      <geometry>
+        <mesh filename="model://spark_plug/meshes/spark_plug_collision.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <gazebo reference="spark_plug">
+    <material>Gazebo/Purple</material>
+    <mu1>0.1</mu1>
+    <mu2>0.1</mu2>
+    <kp>10000.0</kp> 
+    <kd>1000</kd>
+  </gazebo>
+</robot>

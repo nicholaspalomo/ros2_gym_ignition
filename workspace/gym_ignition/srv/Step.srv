@@ -1,0 +1,9 @@
+float64[] action
+---
+float64[] observation
+bool is_done
+float64 reward
+gym_ignition/Rgb rgb
+gym_ignition/Depth depth
+gym_ignition/Thermal thermal
+int8 env_id

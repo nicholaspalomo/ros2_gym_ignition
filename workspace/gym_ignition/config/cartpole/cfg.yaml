@@ -1,0 +1,50 @@
+seed: 1
+device: "cuda"
+
+environment:
+  step_size: 0.001
+  rtf: 1000.0
+  steps_per_run: 1
+  render: True
+  num_envs: 8
+  max_time: 2.0
+  control_dt: 0.01
+  reward:
+    force: 1e-5
+    angle: 1.0
+    terminal: 1.0
+  ppo:
+    architecture:
+      policy: [64, 64]
+      value_net: [64, 64]
+      init_scale: 0.1
+      activation: "Tanh"
+    algorithm:
+      minibatch: 1
+      epoch: 10
+      gamma: 0.98
+      lambda: 0.8
+      entropy_coeff: 0.0
+      learning_rate: 1e-3
+      lr_factor: 0.999999999
+      clip_param: 0.2
+  sac:
+    batch_size: 256
+    k_epochs: 1
+    gamma: 0.99
+    tau: 5e-3
+    target_entropy: -1.
+    lr_actor: 3e-4
+    lr_qnet: 3e-4
+    lr_alpha: 3e-4
+    lr_critic: 3e-4
+    alpha: 0.2
+    update_every_n: 1
+    layer_dim: 256
+    reward_scale: 2.
+    explore_steps: 0 # 10000
+  camera:
+    has_rgb: false
+    has_depth: false
+    has_logical: false
+    has_thermal: false

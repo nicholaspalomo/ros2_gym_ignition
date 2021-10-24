@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kinect">
+  <xacro:arg name="config_file" default=""/>
+  <xacro:arg name="camera_name" default="kinect"/>
+  <xacro:property name="filename" value="$(arg config_file)"/> 
+  <xacro:property name="config" value="${load_yaml(filename)['environment']}"/>
+  <xacro:arg name="env_index" default="0"/>
+  <xacro:property name="env_idx" value="$(arg env_index)" />
+  <xacro:property name="cam_name" value="$(arg camera_name)"/>
+
+  <link name="world"/>
+
+  <!-- Microsoft Kinect / ASUS Xtion PRO Live for simulation -->
+  <!-- camera_name has to be unique! -->
+  <joint name="camera_rgb_joint" type="revolute">
+    <origin xyz="${config['camera']['x']} ${config['camera']['y']} ${config['camera']['z']}" rpy="${config['camera']['R']} ${config['camera']['P']} ${config['camera']['Y']}"/>
+    <parent link="world"/>
+    <child link="camera_rgb_frame"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="0" lower="0" upper="0" velocity="0"/>
+  </joint>
+  <link name="camera_rgb_frame">
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+  <joint name="camera_rgb_optical_joint" type="fixed">
+    <origin rpy="-1.57079632679 0 -1.57079632679" xyz="0 0 0"/>
+    <parent link="camera_rgb_frame"/>
+    <child link="camera_rgb_optical_frame"/>
+  </joint>
+  <link name="camera_rgb_optical_frame">
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+  <joint name="camera_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.031 -0.0 -0.016"/>
+    <parent link="camera_rgb_frame"/>
+    <child link="camera_link"/>
+  </joint>
+  <link name="camera_link">
+    <visual>
+      <origin rpy="0 0 1.57079632679" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="model://kinect/meshes/visual/kinect.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+      <geometry>
+        <box size="0.07271 0.27794 0.073"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+  <joint name="camera_depth_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0.0 0"/>
+    <parent link="camera_rgb_frame"/>
+    <child link="camera_depth_frame"/>
+  </joint>
+  <link name="camera_depth_frame">
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+  <joint name="camera_depth_optical_joint" type="fixed">
+    <origin rpy="-1.57079632679 0 -1.57079632679" xyz="0 0 0"/>
+    <parent link="camera_depth_frame"/>
+    <child link="camera_depth_optical_frame"/>
+  </joint>
+  <link name="camera_depth_optical_frame">
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+    <xacro:if value="${config['camera']['has_depth']}">
+      <gazebo reference="camera_depth_frame">
+        <sensor name="kinect${env_idx}_depth" type="depth_camera">
+          <topic>kinect${env_idx}/depth</topic>
+          <always_on>1</always_on>
+          <update_rate>${config['camera']['depth']['update_rate']}</update_rate>
+          <visualize>1</visualize>
+          <camera>
+              <horizontal_fov>${config['camera']['depth']['fov']}</horizontal_fov>
+              <image>
+                <width>${config['camera']['depth']['resolution']['w']}</width>
+                <height>${config['camera']['depth']['resolution']['h']}</height>
+                <format>R_FLOAT32</format>
+              </image>
+              <clip>
+              <near>${config['camera']['depth']['near']}</near>
+              <far>${config['camera']['depth']['far']}</far>
+              </clip>
+          </camera>
+        </sensor>
+      </gazebo>
+    </xacro:if>
+
+    <xacro:if value="${config['camera']['has_logical']}">
+      <gazebo reference="camera_rgb_frame">
+        <sensor name="kinect${env_idx}_logical" type="logical_camera">
+          <topic>kinect${env_idx}/logical</topic>
+          <always_on>1</always_on>
+          <update_rate>${config['camera']['logical']['update_rate']}</update_rate>
+          <visualize>1</visualize>
+          <logical_camera>
+            <near>${config['camera']['logical']['near']}</near>
+            <far>${config['camera']['logical']['far']}</far>
+            <horizontal_fov>${config['camera']['logical']['fov']}</horizontal_fov>
+            <aspect_ratio>${config['camera']['logical']['aspect_ratio']}</aspect_ratio>
+          </logical_camera>
+        </sensor>
+      </gazebo>
+    </xacro:if>
+
+    <xacro:if value="${config['camera']['has_thermal']}">
+      <gazebo reference="camera_rgb_frame">
+        <sensor name="kinect${env_idx}_thermal" type='thermal'>
+          <camera>
+            <clip>
+              <near>${config['camera']['thermal']['near']}</near>
+              <far>${config['camera']['thermal']['far']}</far>
+            </clip>
+            <horizontal_fov>${config['camera']['thermal']['fov']}</horizontal_fov>
+            <image>
+              <width>${config['camera']['thermal']['resolution']['w']}</width>
+              <height>${config['camera']['thermal']['resolution']['h']}</height>
+            </image>
+          </camera>
+          <topic>kinect${env_idx}/thermal</topic>
+          <always_on>1</always_on>
+          <update_rate>${config['camera']['thermal']['update_rate']}</update_rate>
+          <visualize>1</visualize>
+        </sensor>
+      </gazebo>
+    </xacro:if>
+
+    <xacro:if value="${config['camera']['has_rgb']}">
+      <gazebo reference="camera_rgb_frame">
+        <sensor name="kinect${env_idx}_rgb" type="camera">
+          <topic>kinect${env_idx}/rgb</topic>
+          <always_on>1</always_on>
+          <update_rate>${config['camera']['rgb']['update_rate']}</update_rate>
+          <visualize>1</visualize>
+          <camera>
+            <horizontal_fov>${config['camera']['rgb']['fov']}</horizontal_fov>
+            <image>
+              <width>${config['camera']['rgb']['resolution']['w']}</width>
+              <height>${config['camera']['rgb']['resolution']['h']}</height>
+              <format>RGB_INT8</format>
+            </image>
+            <clip>
+              <near>${config['camera']['rgb']['near']}</near>
+              <far>${config['camera']['rgb']['far']}</far>
+            </clip>
+          </camera>
+        </sensor>
+      </gazebo>
+    </xacro:if>
+</robot>

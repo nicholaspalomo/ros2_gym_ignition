@@ -1,0 +1,2 @@
+prepend-non-duplicate;IGN_GAZEBO_RESOURCE_PATH;share/gym_ignition_description/gym_ignition_models
+prepend-non-duplicate;IGN_GAZEBO_RESOURCE_PATH;share/gym_ignition_description/worlds

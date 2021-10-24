@@ -1,0 +1,7 @@
+std_msgs/Empty request
+---
+float64[] observation
+gym_ignition/Rgb rgb
+gym_ignition/Depth depth
+gym_ignition/Thermal thermal
+int8 env_id

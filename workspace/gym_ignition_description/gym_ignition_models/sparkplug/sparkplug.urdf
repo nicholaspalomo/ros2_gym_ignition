@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="sparkplug">
+  <link name="sparkplug">
+    <inertial>
+      <mass value="0.08"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="1.739e-6" ixy="-5.678e-11" ixz="-2.345e-8" iyy="1.970e-5" iyz="-2.233e-12" izz="1.970e-5"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="model://sparkplug/meshes/visual/sparkplug.stl"/>
+      </geometry>
+      <material name="white">
+        <color rgba="0 0 0 1"/>
+      </material>
+      <plugin
+        filename="ignition-gazebo-thermal-system"
+        name="ignition::gazebo::systems::Thermal">
+        <temperature>600.0</temperature>
+      </plugin>
+    </visual>
+    <collision>
+      <origin rpy="0 1.57079632679 0" xyz="-0.012 0 0"/>
+      <geometry>
+        <!-- <mesh filename="model://sparkplug_socket/meshes/collision/sparkplug_socket.stl"/> -->
+        <cylinder radius="0.009" length="0.072"/>
+        <!-- <box size="0.0127 0.0127 0.072"/> -->
+      </geometry>
+    </collision>
+  </link>
+
+  <gazebo reference="sparkplug">
+    <material>Gazebo/Purple</material>
+    <mu1>1.2</mu1>
+    <mu2>1.2</mu2>
+    <kp>1e+13</kp> 
+    <kd>1</kd>
+  </gazebo>
+
+</robot>

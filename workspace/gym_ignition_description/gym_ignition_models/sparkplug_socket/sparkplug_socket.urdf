@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="sparkplug_socket">
+  <!-- <link name="world"/>
+  <joint name="sparkplug_socket_to_world" type="fixed">
+    <parent link="world"/>
+    <child link="sparkplug_socket_outer"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint> -->
+  <!-- Hack: Make the sparkplug socket super heavy. Unfortunately the base position cannot be changed after spawning in the simulation IF there is a joint between the model and the base frame. :( -->
+  <link name="sparkplug_socket_outer">
+    <inertial>
+      <mass value="1000.0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="1" ixy="1e-1" ixz="-1e-1" iyy="1" iyz="1e-1" izz="1"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="model://sparkplug_socket/meshes/visual/sparkplug_socket_outer.stl"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="model://sparkplug_socket/meshes/collision/sparkplug_socket_outer.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="sparkplug_socket_outer_to_inner" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="sparkplug_socket_outer"/>
+    <child link="sparkplug_socket_inner"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="0" lower="0" upper="0" velocity="0"/>
+  </joint>
+
+  <link name="sparkplug_socket_inner">
+    <inertial>
+      <mass value="0.026"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="5.913e-6" ixy="0" ixz="0" iyy="5.913e-6" iyz="0" izz="2.819e-6"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="model://sparkplug_socket/meshes/visual/sparkplug_socket_inner.stl"/>
+      </geometry>
+      <material name="red">
+        <color rgba="0.8 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="model://sparkplug_socket/meshes/collision/sparkplug_socket_inner.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="sparkplug_socket_inner_to_bottom" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="sparkplug_socket_inner"/>
+    <child link="sparkplug_socket_bottom"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="0" lower="0" upper="0" velocity="0"/>
+  </joint>
+
+  <link name="sparkplug_socket_bottom">
+    <inertial>
+      <mass value="0.028"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="7.691e-7" ixy="0" ixz="0" iyy="7.691e-7" iyz="0" izz="1.420e-6"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="model://sparkplug_socket/meshes/visual/sparkplug_socket_bottom.stl"/>
+      </geometry>
+      <material name="green">
+        <color rgba="0 0.8 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="model://sparkplug_socket/meshes/collision/sparkplug_socket_bottom.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <gazebo reference="sparkplug_socket">
+    <material>Gazebo/White</material>
+    <static>true</static>
+    <turnGravityOff>true</turnGravityOff>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <kp>1e+13</kp> 
+    <kd>1</kd>
+  </gazebo>
+
+</robot>

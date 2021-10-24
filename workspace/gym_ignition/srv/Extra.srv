@@ -1,0 +1,10 @@
+std_msgs/Empty request
+---
+string[] extra_info_keys
+float64[] extra_info
+string[] reward_keys
+float64[] reward
+gym_ignition/Rgb rgb
+gym_ignition/Depth depth
+gym_ignition/Thermal thermal
+int8 env_id

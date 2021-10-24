@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>gym_ignition_description</name>
+  <version>0.0.0</version>
+  <description>Package with URDF and description files for gym_ignition environments.</description>
+  <maintainer email="npalomo@student.ethz.ch">nicholas</maintainer>
+  <license>GNU</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
