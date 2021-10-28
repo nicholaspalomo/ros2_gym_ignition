@@ -8,6 +8,8 @@ This project builds upon the original [`gym-ignition` project](https://github.co
 
 If you want to try out the project without installing all the dependencies, run the Dockerfile in the `~/gym_ignition/workspace/gym_ignition/docker` directory.
 
+First, make sure to have a working [Docker](https://docs.docker.com/engine/install/ubuntu/) installation on your system.
+
 To build the Dockerfile, run:
 
 ```
@@ -25,30 +27,19 @@ for the cartpole example.
 
 To start training policies right away, do the following steps:
 
-1. If you want to try out the project without installing the dependencies, you can build and run the Docker project with:
+1. If you want to try out the project without installing the dependencies, you can build and run the Docker project by following the instructions in the previous section.
 
-```
-cd ~/gym_ignition/workspace/gym_ignition/docker
-docker build -t gym .
-./gym_ignition/workspace/gym_ignition/docker/run.bash gym cartpole
-```
-to launch the cartpole example in a Docker container.
-
-2. You need to install the following libraries:
+2. You need to install the following libraries and dependencies:
 
     - [ROS2 Foxy](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)
     - [iDynTree](https://github.com/robotology/idyntree#installation) - used for computations of forward/inverse kinematics and dynamics. NOTE: Make sure to compile with flag `-DIDYNTREE_USES_IPOPT:BOOL=ON`!
     - [Ignition Edifice](https://ignitionrobotics.org/docs/edifice/install_ubuntu) - the rigid body physics simulator used in this project
-    - Eigen - `sudo apt-get install libeigen3-dev`
     - [fmt](https://fmt.dev/latest/usage.html#installing-the-library) - for `"".format`-like formatting of string expressions in C++
-    - [sdf](http://sdformat.org/tutorials?tut=install) - `sudo apt-get install libsdformat6-dev`
-    - yaml-cpp - `sudo apt install libyaml-cpp-dev`
-    - ruamel - `pip3 install ruamel.yaml`
-    - [gym](https://pypi.org/project/gym/) - `pip3 install gym`
-    - [stable-baselines3](https://pypi.org/project/stable-baselines3/) - `pip3 install stable-baselines3`
-    - opencv - `pip3 install opencv-python`
-    - tensorboard - `pip3 install tensorboard`
-    - [Docker](https://docs.docker.com/engine/install/ubuntu/) (if you want to try out the project) 
+    - other dependencies - 
+    
+    ```
+    sudo apt install libeigen3-dev libsdformat6-dev libyaml-cpp-dev python3-vcstool python3-colcon-common-extensions && pip3 install ruamel.yaml gym stable-baselines3 opencv-python tensorboard
+    ```
 
 3. Clone this repo to your machine.
 
@@ -86,6 +77,8 @@ IGN_GAZEBO_SYSTEM_PLUGIN_PATH=$GYM_IGNITION_DIR/workspace/build/lib:$GYM_IGNITIO
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$IGN_GAZEBO_SYSTEM_PLUGIN_PATH:$IGN_GAZEBO_PHYSICS_ENGINE_PATH
 ```
 where `GYM_IGNITION_DIR` is an environment variable containing the **absolute** path to this repository. It is recommended that you append these paths to your bashrc.
+
+**NOTE**: You may want to check out [this](https://github.com/ros2/ros2/issues/451) issue on GitHub if you have both ROS1 and ROS2 installed on your system and modify your `PYTHONPATH` accordingly for ROS2.
 
 8. To launch your training session, run:
 
