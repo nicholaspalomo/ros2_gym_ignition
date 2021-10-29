@@ -37,12 +37,18 @@ namespace gym_ignition {
                 if(visualizable_)
                     world_->openGazeboGui(5);
 
-                digit_ = world_->insertModel(
-                    get_cwd() + "install/gym_ignition_description/share/gym_ignition_description/gym_ignition_models/digit/digit.urdf",
-                    "digit" + std::to_string(envIndex),
-                    0., 0., 0.,
-                    0., 0., 0.);
+                digit_ = world_->insertRobot(
+                get_cwd() + "install/gym_ignition_description/share/gym_ignition_description/gym_ignition_models/digit/digit.urdf",
+                "digit" + std::to_string(envIndex),
+                MODEL::readJointSerializationFromYaml(cfg["joint_serialization"]),
+                "floating",
+                "torso");
 
+                num_joints_ = robot_->numJoints();
+
+                robot_->enableContacts(true);
+
+                // Reset the initial joint positions and velocities
                 // TODO: Finish setting up MDP for Digit
 
             }
@@ -95,6 +101,10 @@ namespace gym_ignition {
             std::unique_ptr<KINEMATICS> digit_;
 
             Eigen::VectorXd ob_double_, ob_scaled_, action_unscaled_, action_mean_, action_std_, ob_mean_, ob_std_, p_target_;
+
+            int num_joints_;
+
+            std::vector<double> initial_joint_positions_, initial_joint_velocities_;
         
     };
 
