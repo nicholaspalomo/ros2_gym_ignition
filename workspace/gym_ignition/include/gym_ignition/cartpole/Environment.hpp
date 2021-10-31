@@ -189,7 +189,7 @@ class ENVIRONMENT : public GymIgnitionEnv {
         std::normal_distribution<double> distribution_;
         std::uniform_real_distribution<double> uniform_dist_;
 
-        std::unique_ptr<MODEL> cartpole_;
+        std::unique_ptr<Model> cartpole_;
 
         Eigen::VectorXd obDouble_, obScaled_, actionUnscaled_, actionMean_, actionStd_, obMean_, obStd_, pTarget_;
 

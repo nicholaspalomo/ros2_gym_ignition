@@ -7,13 +7,13 @@
 namespace gym_ignition{
 
 // This class is used for creating an instance of a robot in simulation that has a camera fixed rigidly to one of the frames of the robot (e.g. to the end effector/hand/head) 
-class ROBOTCAMERA {
+class RobotCamera {
 
     public:
 
-        explicit ROBOTCAMERA(
-            std::unique_ptr<KINEMATICS>& robotKinematics,
-            std::unique_ptr<CAMERA>& robotCamera) :
+        explicit RobotCamera(
+            std::unique_ptr<Kinematics>& robotKinematics,
+            std::unique_ptr<Camera>& robotCamera) :
             robotKinematics_(std::move(robotKinematics)),
             robotCamera_(std::move(robotCamera))
         {}
@@ -185,8 +185,8 @@ class ROBOTCAMERA {
 
     private:
 
-        std::unique_ptr<KINEMATICS> robotKinematics_;
-        std::unique_ptr<CAMERA> robotCamera_;
+        std::unique_ptr<Kinematics> robotKinematics_;
+        std::unique_ptr<Camera> robotCamera_;
 };
 
 }

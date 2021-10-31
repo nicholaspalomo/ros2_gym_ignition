@@ -10,11 +10,11 @@
 
 namespace gym_ignition {
 
-class CAMERA : public MODEL {
+class Camera : public Model {
 
     public:
 
-        explicit CAMERA(
+        explicit Camera(
             scenario::core::ModelPtr robotPtr,
             const std::string cameraName, /* e.g. kinect0, camera1, realsense2, ... */
             const YAML::Node& cfg,
@@ -22,7 +22,7 @@ class CAMERA : public MODEL {
             const std::string urdfPath, /* name of URDF, created in same directory as xacro */ 
             const std::string resourceDir, 
             const std::unordered_map<std::string, std::any>& kwargs = {} /* kwargs-like dictionary of additional arguments to pass to xacro command */) :
-            MODEL(robotPtr, urdfPath) {
+            Model(robotPtr, urdfPath) {
 
             hasRgb_ = cfg["camera"]["has_rgb"].template as<bool>();
             hasDepth_ = cfg["camera"]["has_depth"].template as<bool>();
@@ -66,7 +66,7 @@ class CAMERA : public MODEL {
             createSubscriptions_(hasRgb_, hasDepth_, hasLogical_, hasThermal_, cameraName);
         }
 
-        ~CAMERA() { }
+        ~Camera() { }
 
         int rgbImageWidth() {
             return rgbImageWidth_;
@@ -235,25 +235,25 @@ class CAMERA : public MODEL {
             const std::string& cameraName) {
 
             if(hasRgb) {
-                if(!ignitionNode_.Subscribe("/" + cameraName + "/rgb", &CAMERA::rgbCameraCallback_, this)) {
+                if(!ignitionNode_.Subscribe("/" + cameraName + "/rgb", &Camera::rgbCameraCallback_, this)) {
                     std::cerr << "[Camera.hpp] Error subscribing to the RGB camera topic." << std::endl;
                 }
             }
 
             if(hasDepth) {
-                if(!ignitionNode_.Subscribe("/" + cameraName + "/depth", &CAMERA::depthCameraCallback_, this)) {
+                if(!ignitionNode_.Subscribe("/" + cameraName + "/depth", &Camera::depthCameraCallback_, this)) {
                     std::cerr << "[Camera.hpp] Error subscribing to the depth camera topic." << std::endl;
                 }
             }
 
             if(hasLogical) {
-                if(!ignitionNode_.Subscribe("/" + cameraName + "/logical", &CAMERA::logicalCameraCallback_, this)) {
+                if(!ignitionNode_.Subscribe("/" + cameraName + "/logical", &Camera::logicalCameraCallback_, this)) {
                     std::cerr << "[Camera.hpp] Error subscribing to the logical camera topic." << std::endl;
                 }
             }
 
             if(hasThermal) {
-                if(!ignitionNode_.Subscribe("/" + cameraName + "/thermal", &CAMERA::thermalCameraCallback_, this)) {
+                if(!ignitionNode_.Subscribe("/" + cameraName + "/thermal", &Camera::thermalCameraCallback_, this)) {
                     std::cerr << "[Camera.hpp] Error subscribing to the thermal camera topic." << std::endl;
                 }
             }

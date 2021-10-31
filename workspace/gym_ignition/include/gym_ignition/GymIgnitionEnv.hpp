@@ -169,7 +169,7 @@ class GymIgnitionEnv : public rclcpp::Node {
             visualizable_(render),
             resourceDir_(std::move(resourceDir)),
             cfg_(cfg),
-            world_(std::make_unique<WORLD>(cfg_["step_size"].template as<double>(), cfg_["rtf"].template as<double>(), cfg_["steps_per_run"].template as<size_t>())) {
+            world_(std::make_unique<World>(cfg_["step_size"].template as<double>(), cfg_["rtf"].template as<double>(), cfg_["steps_per_run"].template as<size_t>())) {
 
             // read the reward names and coefficients from the YAML config
             rewardCoeffs_.readFromYaml(cfg_["reward"]);
@@ -233,7 +233,7 @@ class GymIgnitionEnv : public rclcpp::Node {
         std::string resourceDir_;
         YAML::Node cfg_;
 
-        std::unique_ptr<WORLD> world_;
+        std::unique_ptr<World> world_;
         controlClbkPtr rlControlCallbackPtr_;
 
         int obsDim_ = 0, actionDim_ = 0, extraInfoDim_ = 0;

@@ -7,11 +7,11 @@
 
 namespace gym_ignition{
 
-class MODEL {
+class Model {
 
     public:
 
-        explicit MODEL(
+        explicit Model(
             scenario::core::ModelPtr robot,
             const std::string urdfPath,
             std::vector<std::string> joints = {}) :

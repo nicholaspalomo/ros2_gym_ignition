@@ -11,11 +11,11 @@
 
 namespace gym_ignition{
 
-class WORLD {
+class World {
 
     public:
 
-        explicit WORLD(
+        explicit World(
             double stepSize_,
             double rtf,
             size_t stepsPerRun) :
@@ -26,7 +26,7 @@ class WORLD {
             stepsPerRun_ = stepsPerRun;
         }
 
-        ~WORLD() {
+        ~World() {
             gazebo_->close();
         }
 
@@ -75,7 +75,7 @@ class WORLD {
             }
         }
 
-        std::unique_ptr<MODEL> insertModel(
+        std::unique_ptr<Model> insertModel(
             const std::string modelPath,
             const std::string modelName,
             const double x, const double y, const double z,
@@ -84,7 +84,7 @@ class WORLD {
             return insertObject(modelPath, modelName, x, y, z, R, P, Y);
         }
 
-        std::unique_ptr<MODEL> insertObject(
+        std::unique_ptr<Model> insertObject(
             const std::string modelPath,
             const std::string modelName,
             const double x, const double y, const double z,
@@ -94,12 +94,12 @@ class WORLD {
 
             insertModel_(modelPath, modelName, pose);
 
-            return std::make_unique<MODEL>(
+            return std::make_unique<Model>(
                     world_->getModel(/*modelName=*/modelName),
                     modelPath);
         }
 
-        std::unique_ptr<ROBOTCAMERA> insertRobotWithCamera(
+        std::unique_ptr<RobotCamera> insertRobotWithCamera(
             const std::string modelPath,
             const std::string modelName,
             const YAML::Node& cameraYamlCfg,
@@ -130,7 +130,7 @@ class WORLD {
                     baseConstraint,
                     baseFrame);
 
-            auto robotCamera = std::make_unique<CAMERA>(
+            auto robotCamera = std::make_unique<Camera>(
                     world_->getModel(/*modelName=*/modelName),
                     modelName,
                     cameraYamlCfg,
@@ -139,12 +139,12 @@ class WORLD {
                     resourceDir,
                     kwargs);
 
-            return std::make_unique<ROBOTCAMERA>(
+            return std::make_unique<RobotCamera>(
                 robotKinematics, 
                 robotCamera);
         }
 
-        std::unique_ptr<KINEMATICS> insertRobot(
+        std::unique_ptr<Kinematics> insertRobot(
             const std::string modelPath,
             const std::string modelName,
             const double x, const double y, const double z,
@@ -185,7 +185,7 @@ class WORLD {
             groundGazebo_->enableSelfCollisions(enable);
         }
 
-        std::unique_ptr<CAMERA> insertCamera(
+        std::unique_ptr<Camera> insertCamera(
             const std::string modelName,
             const YAML::Node& cameraYamlCfg,
             const std::string xacroPath,
@@ -210,7 +210,7 @@ class WORLD {
 
             insertModel_(urdfPath, modelName, pose);
 
-            return std::make_unique<CAMERA>(
+            return std::make_unique<Camera>(
                 world_->getModel(/*modelName=*/modelName),
                 modelName,
                 cameraYamlCfg,
@@ -221,7 +221,7 @@ class WORLD {
 
         }
 
-        std::unique_ptr<KINEMATICS> insertRobot(
+        std::unique_ptr<Kinematics> insertRobot(
             const std::string modelPath,
             const std::string modelName,
             int envIndex,
@@ -245,7 +245,7 @@ class WORLD {
             return robotPtr;
         }
 
-        std::unique_ptr<KINEMATICS> insertRobot(
+        std::unique_ptr<Kinematics> insertRobot(
             const std::string modelPath,
             const std::string modelName,
             std::vector<std::string> joints = {},
@@ -257,14 +257,14 @@ class WORLD {
             return robotPtr;
         }
 
-        std::unique_ptr<KINEMATICS> getModel(
+        std::unique_ptr<Kinematics> getModel(
             const std::string modelPath,
             const std::string modelName,
             std::vector<std::string> joints = {},
             const std::string baseConstraint = "floating",
             const std::string baseFrame = "base_link") { 
 
-            return std::make_unique<KINEMATICS>(
+            return std::make_unique<Kinematics>(
                 world_->getModel(/*modelName=*/modelName),
                 modelPath,
                 joints,
@@ -364,7 +364,7 @@ class WORLD {
             }
 
             // Before spawning the camera, we need to make sure that we first generate its URDF according to the provided function parameters
-            CAMERA::generateUrdfFromXacro(
+            Camera::generateUrdfFromXacro(
                 modelName, 
                 xacroPath, 
                 urdfPath, 

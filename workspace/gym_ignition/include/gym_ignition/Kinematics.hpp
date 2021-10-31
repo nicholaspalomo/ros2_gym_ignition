@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms of the
 // GNU Lesser General Public License v2.1 or any later version.
 
-// This class implements generic inverse and forward kinematics operations for articulated systems whose URDF follow a tree-like structure (i.e. no loops in the linkages). It is meant to be used as a member of the MODEL class.
+// This class implements generic inverse and forward kinematics operations for articulated systems whose URDF follow a tree-like structure (i.e. no loops in the linkages). It is meant to be used as a member of the Kinematics class.
 
 #ifndef SRC_GYMIGNITION_KINEMATICS_HPP
 #define SRC_GYMIGNITION_KINEMATICS_HPP
@@ -18,18 +18,18 @@
 
 namespace gym_ignition{
 
-class KINEMATICS : public MODEL {
+class Kinematics : public Model {
 
     public:
 
-        explicit KINEMATICS(
+        explicit Kinematics(
             scenario::core::ModelPtr robot,
             const std::string urdfPath,
             std::vector<std::string> joints = {},
             const std::string baseConstraint = "floating",
             const std::string baseFrame = "base_link",
             const std::vector<double> nominalJointPositions = {}) :
-            MODEL(robot, urdfPath, joints),
+            Model(robot, urdfPath, joints),
             baseConstraint_(baseConstraint),
             baseFrame_(baseFrame),
             fk_(std::make_unique<iDynTree::KinDynComputations>()),
