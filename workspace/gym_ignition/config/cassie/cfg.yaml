@@ -1,0 +1,118 @@
+device: "cpu"
+# TODO: add the initial/nominal joint positions for Cassie
+environment:
+  step_size: 0.001
+  rtf: 1000.0
+  steps_per_run: 1
+  render: True
+  num_envs: 1 # run with more than 1 environment, if computing resources available
+  seed: 1
+  control_dt: 0.0025 # seconds
+  max_time: 6.0 # seconds
+  reward:
+    gait: 0.1
+    arms: 0.001
+    target_following: 1.0
+  initial_joint_positions: [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.] 
+  pid_gains:
+    hip_abduction_left:           {p: 100., i: 0., d: 17.5}
+    hip_rotation_left:            {p: 100., i: 0., d: 17.5}
+    hip_flexion_left:             {p: 100., i: 0., d: 17.5}
+    knee_joint_left:              {p: 100., i: 0., d: 17.5}
+    knee_to_shin_left:            {p: 100., i: 0., d: 17.5}
+    ankle_joint_left:             {p: 100., i: 0., d: 17.5}
+    toe_joint_left:               {p: 100., i: 0., d: 17.5}
+    hip_abduction_right:          {p: 100., i: 0., d: 17.5}
+    hip_rotation_right:           {p: 100., i: 0., d: 17.5}
+    hip_flexion_right:            {p: 100., i: 0., d: 17.5}
+    knee_joint_right:             {p: 100., i: 0., d: 17.5}
+    knee_to_shin_right:           {p: 100., i: 0., d: 17.5}
+    ankle_joint_right:            {p: 100., i: 0., d: 17.5}
+    toe_joint_right:              {p: 100., i: 0., d: 17.5}
+  joint_serialization:
+    - hip_abduction_left
+    - hip_rotation_left
+    - hip_flexion_left
+    - knee_joint_left
+    - knee_to_shin_left
+    - ankle_joint_left
+    - toe_joint_left
+    - hip_abduction_right
+    - hip_rotation_right
+    - hip_flexion_right
+    - knee_joint_right
+    - knee_to_shin_right
+    - ankle_joint_right
+    - toe_joint_right
+  control_target_type: "joint efforts" # TODO: "joint positions"?
+  sac:
+    batch_size: 256
+    k_epochs: 1
+    gamma: 0.99
+    tau: 5e-3
+    target_entropy: -3.
+    lr_actor: 1.5e-4
+    lr_qnet: 1.5e-4
+    lr_alpha: 1.5e-4
+    lr_critic: 1.5e-4
+    alpha: 0.2
+    update_every_n: 1
+    layer_dim: 256
+    reward_scale: 10.
+    explore_steps: 0 # 100
+  ppo:
+    architecture:
+      policy: [256, 256]
+      value_net: [256, 256]
+      init_scale: 0.1
+      activation: "Tanh"
+      num_hidden_layers: 2
+      hidden_size: 256
+    algorithm:
+      minibatch: 1
+      epoch: 20
+      gamma: 0.98
+      lambda: 0.8
+      entropy_coeff: 0.0
+      learning_rate: 5e-4
+      lr_factor: 0.999999999
+      clip_param: 0.2
+      sampler: 'shuffle'
+  model:
+    type: "floating"
+    base_link: "torso"
+  camera: # TODO: Add a camera for perception/autonomous navigation
+    has_rgb: false
+    has_depth: false
+    has_logical: false
+    has_thermal: false
+    x: 1.5
+    y: 0.0
+    z: 0.25
+    R: 0.0
+    P: -0.09817477042
+    Y: 3.14159265359
+    depth:
+      update_rate: 10
+      near: 0.1
+      far: 10.0
+      fov: 1.047
+      format: R_FLOAT32
+      resolution:
+        w: 256
+        h: 256
+    rgb:
+      update_rate: 10
+      near: 0.1
+      far: 10.0
+      fov: 1.047
+      format: RGB_INT8
+      resolution:
+        w: 256
+        h: 256
+    logical:
+      update_rate: 10
+      near: 0.1
+      far: 10.0
+      fov: 1.047
+      aspect_ratio: 1.0
