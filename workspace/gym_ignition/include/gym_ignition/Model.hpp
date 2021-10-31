@@ -345,6 +345,19 @@ class Model {
             return robot_->linkNames(scoped);
         }
 
+        uint8_t getLinkIndexFromName(const std::string linkName, const bool scoped = false) {
+
+            auto linkNames = getLinkNames(scoped);
+            auto linkIt = std::find(linkNames.begin(), linkNames.end(), linkName);
+
+            if(linkIt != linkNames.end()) {
+                return linkIt - linkNames.begin();
+            }else{
+                return -1;
+            }
+
+        }
+
         bool inContact(
             const std::string linkName) {
 
