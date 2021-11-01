@@ -130,6 +130,11 @@ namespace gym_ignition {
             cr * cp * sy - sr * sp * cy});
     }
 
+    template Eigen::Matrix<T, 3, 3> quat2RotMat(Eigen::Quaternion<T> quat) {
+
+        return quat.normalized().toRotationMatrix();
+    }
+
     template<class T>
     inline Eigen::Matrix<T, 3, 3> rpy2RotMat(const T R, const T P, const T Y) {
 

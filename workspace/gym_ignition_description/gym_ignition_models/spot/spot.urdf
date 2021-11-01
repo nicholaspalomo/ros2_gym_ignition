@@ -7,13 +7,13 @@
   <link name="body">
     <visual>
       <geometry>
-        <mesh filename="meshes/body.dae"/>
+        <mesh filename="model://spot/meshes/visual/body.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <!-- <mesh filename="meshes/body_collision.stl" /> -->
+        <!-- <mesh filename="model://spot/meshes/collision/body_collision.stl" /> -->
         <box size="0.86 0.21 0.17"/>
       </geometry>
     </collision>
@@ -43,13 +43,13 @@
   <link name="front_left_hip">
     <visual>
       <geometry>
-        <mesh filename="meshes/front_left_hip.dae"/>
+        <mesh filename="model://spot/meshes/visual/front_left_hip.dae"/>
       </geometry>
     </visual>
     <!-- <collision>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
                 <geometry>
-                    <mesh filename="meshes/${leg_name}_hip_collision.stl" />
+                    <mesh filename="model://spot/meshes/collision/${leg_name}_hip_collision.stl" />
                     <cylinder radius="${hip_width}" length="${hip_length}"/>
                 </geometry>
             </collision> -->
@@ -68,13 +68,13 @@
   <link name="front_left_upper_leg">
     <visual>
       <geometry>
-        <mesh filename="meshes/front_left_upper_leg.dae"/>
+        <mesh filename="model://spot/meshes/visual/front_left_upper_leg.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 -0.10625"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_upper_leg_collision.stl" /> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_upper_leg_collision.stl" /> -->
         <cylinder length="0.34" radius="0.0456"/>
       </geometry>
     </collision>
@@ -94,13 +94,13 @@
   <link name="front_left_lower_leg">
     <visual>
       <geometry>
-        <mesh filename="meshes/front_left_lower_leg.dae"/>
+        <mesh filename="model://spot/meshes/visual/front_left_lower_leg.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 -0.147"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
         <cylinder length="0.252" radius="0.035"/>
       </geometry>
     </collision>
@@ -129,7 +129,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.035"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
         <sphere radius="0.035"/>
       </geometry>
     </collision>
@@ -172,13 +172,13 @@
   <link name="front_right_hip">
     <visual>
       <geometry>
-        <mesh filename="meshes/front_right_hip.dae"/>
+        <mesh filename="model://spot/meshes/visual/front_right_hip.dae"/>
       </geometry>
     </visual>
     <!-- <collision>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
                 <geometry>
-                    <mesh filename="meshes/${leg_name}_hip_collision.stl" />
+                    <mesh filename="model://spot/meshes/collision/${leg_name}_hip_collision.stl" />
                     <cylinder radius="${hip_width}" length="${hip_length}"/>
                 </geometry>
             </collision> -->
@@ -197,13 +197,13 @@
   <link name="front_right_upper_leg">
     <visual>
       <geometry>
-        <mesh filename="meshes/front_right_upper_leg.dae"/>
+        <mesh filename="model://spot/meshes/visual/front_right_upper_leg.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 -0.10625"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_upper_leg_collision.stl" /> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_upper_leg_collision.stl" /> -->
         <cylinder length="0.34" radius="0.0456"/>
       </geometry>
     </collision>
@@ -223,13 +223,13 @@
   <link name="front_right_lower_leg">
     <visual>
       <geometry>
-        <mesh filename="meshes/front_right_lower_leg.dae"/>
+        <mesh filename="model://spot/meshes/visual/front_right_lower_leg.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 -0.147"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
         <cylinder length="0.252" radius="0.035"/>
       </geometry>
     </collision>
@@ -258,7 +258,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.035"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
         <sphere radius="0.035"/>
       </geometry>
     </collision>
@@ -301,13 +301,13 @@
   <link name="rear_left_hip">
     <visual>
       <geometry>
-        <mesh filename="meshes/rear_left_hip.dae"/>
+        <mesh filename="model://spot/meshes/visual/rear_left_hip.dae"/>
       </geometry>
     </visual>
     <!-- <collision>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
                 <geometry>
-                    <mesh filename="meshes/${leg_name}_hip_collision.stl" />
+                    <mesh filename="model://spot/meshes/collision/${leg_name}_hip_collision.stl" />
                     <cylinder radius="${hip_width}" length="${hip_length}"/>
                 </geometry>
             </collision> -->
@@ -326,13 +326,13 @@
   <link name="rear_left_upper_leg">
     <visual>
       <geometry>
-        <mesh filename="meshes/rear_left_upper_leg.dae"/>
+        <mesh filename="model://spot/meshes/visual/rear_left_upper_leg.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 -0.10625"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_upper_leg_collision.stl" /> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_upper_leg_collision.stl" /> -->
         <cylinder length="0.34" radius="0.0456"/>
       </geometry>
     </collision>
@@ -352,13 +352,13 @@
   <link name="rear_left_lower_leg">
     <visual>
       <geometry>
-        <mesh filename="meshes/rear_left_lower_leg.dae"/>
+        <mesh filename="model://spot/meshes/visual/rear_left_lower_leg.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 -0.147"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
         <cylinder length="0.252" radius="0.035"/>
       </geometry>
     </collision>
@@ -387,7 +387,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.035"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
         <sphere radius="0.035"/>
       </geometry>
     </collision>
@@ -430,13 +430,13 @@
   <link name="rear_right_hip">
     <visual>
       <geometry>
-        <mesh filename="meshes/rear_right_hip.dae"/>
+        <mesh filename="model://spot/meshes/visual/rear_right_hip.dae"/>
       </geometry>
     </visual>
     <!-- <collision>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
                 <geometry>
-                    <mesh filename="meshes/${leg_name}_hip_collision.stl" />
+                    <mesh filename="model://spot/meshes/collision/${leg_name}_hip_collision.stl" />
                     <cylinder radius="${hip_width}" length="${hip_length}"/>
                 </geometry>
             </collision> -->
@@ -455,13 +455,13 @@
   <link name="rear_right_upper_leg">
     <visual>
       <geometry>
-        <mesh filename="meshes/rear_right_upper_leg.dae"/>
+        <mesh filename="model://spot/meshes/visual/rear_right_upper_leg.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 -0.10625"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_upper_leg_collision.stl" /> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_upper_leg_collision.stl" /> -->
         <cylinder length="0.34" radius="0.0456"/>
       </geometry>
     </collision>
@@ -481,13 +481,13 @@
   <link name="rear_right_lower_leg">
     <visual>
       <geometry>
-        <mesh filename="meshes/rear_right_lower_leg.dae"/>
+        <mesh filename="model://spot/meshes/visual/rear_right_lower_leg.dae"/>
       </geometry>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 -0.147"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
         <cylinder length="0.252" radius="0.035"/>
       </geometry>
     </collision>
@@ -516,7 +516,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.035"/>
       <geometry>
-        <!-- <mesh filename="meshes/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
+        <!-- <mesh filename="model://spot/meshes/collision/${leg_name}_lower_leg_collision.stl" scale="0.82 0.97 0.98"/> -->
         <sphere radius="0.035"/>
       </geometry>
     </collision>

@@ -53,8 +53,6 @@ namespace gym_ignition {
                 initial_joint_velocities_ = std::vector<double>(initial_joint_positions_.size(), 0.);
                 initial_joint_positions_vec_ = stdVec2EigenVec<double>(initial_joint_positions_);
 
-                spot_->resetJointStates(initial_joint_positions_, initial_joint_velocities_);
-
                 // controller period for joint PIDs
                 spot_->setJointControllerPeriod(cfg_["joint_control_dt"].template as<double>());
 
@@ -62,12 +60,13 @@ namespace gym_ignition {
                 spot_->setJointControlMode(scenario::core::JointControlMode::Force);
 
                 // Populate the P, D gains from the YAML config
-                P_.setZero(num_joints_, num_joints_);
-                D_.setZero(num_joints_, num_joints_);
+                p_gain_.setZero(num_joints_);
+                i_gain_.setZero(num_joints_);
+                d_gain_.setZero(num_joints_);
                 int i = 0;
                 for(auto joint_name : robot_->jointNames()) {
-                    P_(i, i) = cfg_["pid_gains"][joint_name]["p"].template as<double>();
-                    D_(i, i) = cfg_["pid_gains"][joint_name]["d"].template as<double>();
+                    p_gain_(i) = cfg_["pid_gains"][joint_name]["p"].template as<double>();
+                    d_gain_(i) = cfg_["pid_gains"][joint_name]["d"].template as<double>();
                     i++;
                 }
 
@@ -75,7 +74,7 @@ namespace gym_ignition {
                 setRlControlCallback(cfg_["control_target_type"]);
 
                 buffer_length_ = cfg_["buffer_length"].template as<double>();
-                nominal_body_height_ = cfg_["body_height_target"].template as<double>();
+                body_height_ = cfg_["body_height_target"].template as<double>();
 
                 // Initialize the GymIgnitionEnv private members
                 actionDim_ = num_joints_ + 1;
@@ -106,7 +105,7 @@ namespace gym_ignition {
                 action_std_.setZero(actionDim_);
                 p_target_.setZero(num_joints_);
                 action_unscaled_.setZero(actionDim_);
-                final_joint_targets_.setZero(num_joints_-2);
+                final_joint_targets_.setZero(num_joints_);
                 action_history_.setZero(3 * actionDim_);
                 actionHistory_ << initial_joint_positions_vec_, 0.,
                                   initial_joint_positions_vec_, 0.,
@@ -123,7 +122,7 @@ namespace gym_ignition {
                 action_std_(num_joints_) = 0.1;
                 
                 // Observation scaling
-                ob_mean_ << nominal_body_height_,
+                ob_mean_ << body_height_,
                             0., 0., 0.,
                             initial_joint_positions_vec_,
                             Eigen::VectorXd::Constant(6, 0.0),
@@ -163,28 +162,268 @@ namespace gym_ignition {
                     stance_gait_params_.swing_start[i] = 0.;
                     stance_gait_params_.swing_duration[i] = 0.;
                     stance_gait_params_.foot_target[i] = 0.;
+
+                    auto foot_name = cfg_["end_effector_frame_names"].template as<std::vector<double>>()[i];
+
+                    default_gait_params_.ee_frame_names[i] = foot_name;
+                    stance_gait_params_.ee_frame_names[i] = foot_name;
+
+                    // read the foot indices from the model
+                    foot_indices_.insert(spot_->getLinkIndexFromName(foot_name));
                 }
 
                 default_gait_params_.stride = cfg_["gait_params"]["default"]["stride"].template as<double>();
                 default_gait_params_.max_foot_height = cfg_["gait_params"]["foot_target"].template as<double>();
 
-                // read the foot indices from the model
+            }
+
+            void setRlControlCallback(
+                const YAML::Node node) {
+                // In this method, user can specify what type of target to be applied at the joints - for example: joint torques, joint positions, joint velocities, etc.
+
+                std::string controlTargetType = node.template as<std::string>();
+
+                // specify joint POSITION targets for the actuators
+                if((controlTargetType.find("joint") != std::string::npos) && (controlTargetType.find("angle") != std::string::npos)) {
+                    rlControlCallbackPtr_ = [this]() { robot_->setJointPositionTargets(final_joint_targets_); };
+                }
+
+                // specify joint EFFORT targets for actuators
+                if((controlTargetType.find("joint") != std::string::npos) && (controlTargetType.find("effort") != std::string::npos)) {
+                    rlControlCallbackPtr_ = [this]() { robot_->setJointEffortTargets(final_joint_targets_); };
+                }                
+
+            }
+
+            void init() final {
 
             }
 
             void reset() final {
+                step_ = -1;
+                gen_force_.setZero(spot_->generalizedVelocityDim());
+                err_curr_.setZero(num_joints_);
+                err_prev_.setZero(num_joints_);
+                err_int_.setZero(num_joints_);
 
                 spot_->resetBasePose(
                     0,
                     0,
-                    nominal_body_height_,
+                    body_height_,
                     0,
                     0,
                     0);
 
+                spot_->resetJointStates(initial_joint_positions_, initial_joint_velocities_);
+
+                world_->pauseGazebo();
+
+                sampleVelocity_();
+                updateGaitParameters_();
+                updateObservation_();
+
+            }
+
+            inline double sampleUniform(double lower, double upper) {
+                return lower + uniform_dist_(rand_num_gen_) * (upper - lower);
+            }
+
+            inline double wrap01(double a) {
+                return a - fastFloor(a);
+            }
+
+            inline int fastFloor(double a) {
+                int i = int(a);
+                if(i > a) i--;
+                return i;
+            }
+
+            float step(
+                const Eigen::VectorXd& action) final {
+
+                action_unscaled_ = action;
+                action_unscaled_ = action_unscaled_.cwiseProduct(action_std_);
+                action_unscaled_ += action_mean_;
+
+                p_target_.tail(num_joints_) = action_unscaled_.head(num_joints_);
+                gait_freq_ = action_unscaled_(num_joints_);
+
+                // update the action history buffer
+                Eigen::VectorXd temp;
+                temp.setZero(2 * actionDim_);
+                temp = action_history_.tail(2 * actionDim_);
+                action_history_.tail(actionDim_) = action_unscaled_;
+                action_history_.head(2 * actionDim_) = temp;
+
+                auto loop_count = int(getControlTimeStep() / getSimulationTimeStep() + 1e-10);
+
+                for(int i = 0; i < loop_count; i++) {
+                    Eigen::VectorXd gc = spot_->generalizedCoordinates();
+                    Eigen::VectorXd gv = spot_->generalizedVelocities();        
+
+                    err_curr_ = p_target_.tail(num_joints_) - gc.tail(num_joints_);
+
+                    gen_force_.tail(num_joints_) = p_gain_.cwiseProduct(err_curr_) + i_gain_.cwiseProduct(err_int_) + d_gain_.cwiseProduct(err_curr_ - err_prev_) / getSimulationTimeStep();
+
+                    final_joint_targets_ = gen_force_.tail(num_joints_);
+
+                    world_->integrate(1, rlControlCallbackPtr_);
+                }
+                
+                updateObservation_();
+
+                return getReward_();
             }
 
         private:
+
+            void sampleVelocity_() {
+                default_gait_params_.is_stance_gait = false;
+                gait_params_ = default_gait_params_;
+
+                target_velocity_[0] = sampleUniform(command_params_["x"][0], command_params_["x"][1]);
+                target_velocity_[1] = sampleUniform(command_params_["y"][0], command_params_["y"][1]);
+                target_velocity_[2] = sampleUniform(command_params_["yaw"][0], command_params_["yaw"][1]);
+
+                if(uniform_dist_(rand_num_gen_) < 0.1)
+                    target_velocity_[0] = 0.;
+                
+                if(uniform_dist_(rand_num_gen_) < 0.1)
+                    target_velocity_[1] = 0.;
+                
+                if(uniform_dist_(rand_num_gen_) < 0.1)
+                    target_velocity_[2] = 0.;
+                
+
+            }
+
+            void updateGaitParameters_() {
+
+                if(!gait_params_.is_stance_gait) {
+                    // update phase
+                    double freq = (1.0 / gait_params_.stride + gait_freq_) * getControlTimeStep();
+                    gait_params_.phase = wrap01(gait_params_.phase + freq);
+
+                    // Get the current gait parameters
+                    for(int i = 0; i < 4; i++) {
+                        double swing_end = wrap01(gait_params_.swing_start[i] + gait_params_.swing_duration[i]);
+                        double phase_shifted = wrap01(gait_params_.phase - swing_end);
+                        double swing_start_shifted = 1.0 - gait_params_.swing_duration[i];
+
+                        if(phase_shifted < swing_start_shifted) { // stance phase
+                            gait_params_.desired_contact_state[i] = 1.0;
+                            gait_params_.phase_time_left[i] = (swing_start_shifted - phase_shifted) * gait_params_.stride;
+                            gait_params_.foot_target[i] = 0.0;
+                        } else {
+                            gait_params_.desired_contact_states[i] = 0.0;
+                            gait_params_.phase_time_left[i] = (1.0 - phase_shifted) * gait_params_.stride;
+                            gait_params_.foot_target[i] = gait_params_.max_foot_height * ( -std::sin(2 * M_PI * phase_shifted) < 0. ? 0. : -std::sin(2 * M_PI * phase_shifted) );
+                        }
+                    }
+                }
+
+            }
+
+            void getFootContacts() {
+
+                // Get the foot contact states
+                std::fill(std::begin(gait_params_.foot_contact_states, std::end(gait_params_.foot_contact_states)), false);
+
+                int i = 0;
+                for(auto ee_link_name : gait_params_.ee_frame_names) {
+                    auto ee_contacts = robot_->getLinkContacts(ee_link_name);
+
+                    // If the end effector is in contact with the ground, set the contact state to true for the end effector
+                    for(auto ee_contact : ee_contacts) {
+                        if((ee_contact.bodyA).find("ground") != std::string::npos || (ee_contact.bodyA).find("ground") != std::string::npos) {
+                            gait_params_.foot_contact_states[i] = true;
+                        }
+                    }
+
+                    i++;
+                }
+
+            }
+
+            void getReward_() {
+
+
+            }
+
+            void updateObservation_() {
+                
+                Eigen::VectorXd gc = spot_->generalizedCoordinates();
+                Eigen::VectorXd gv = spot_->generalizedVelocities();
+
+                getFootContacts_();
+
+                body_height_ = gc[2]; // Assuming flat ground!
+
+                int pos = 0;
+
+                // body height
+                ob_double_(pos) = body_height_; pos++;
+
+                // body orientation
+                Eigen::Quaterniond quat;
+                quat.w() = gc[3];
+                quat.x() = gc[4];
+                quat.y() = gc[5];
+                quat.z() = gc[6];
+
+                Eigen::Matrix<double, 3, 3> rot_mat_body2world = quat2RotMat<double>(quat);
+
+                ob_double_.segment(pos, 3) = rot_mat_body2world.row(2); pos += 3;
+
+                // joint angles
+                ob_double_.segment(pos, num_joints_) = gc.tail(num_joints_); pos += num_joints_;
+
+                // body linear velocity
+                body_linear_vel_ = rot_mat_body2world.transpose() * gv.segment(0, 3);
+                ob_double_.segment(pos, 3) = body_linear_vel_; pos += 3;
+
+                // body angular velocity
+                body_angular_vel_ = rot_mat_body2world.transpose() * gv.segment(3, 3);
+                ob_double_.segment(pos, 3) = body_angular_vel_; pos += 3;
+
+                // joint velocities
+                ob_double_.segment(pos, num_joints_) = gv.tail(num_joints_); pos += num_joints_;
+
+                // target velocity
+                ob_double_.segment(pos, 3) = target_velocity_; pos += 3;
+
+                // action history
+                ob_double_.segment(pos, 3 * actionDim_) = action_history_; pos += 3 * actionDim_;
+
+                // gait parameters
+                ob_double_(pos) = gait_params_.stride; pos++;
+
+                for(int i = 0; i < 4; i++) {
+
+                    ob_double_(pos) = gait_params_.swing_start[i];
+                    ob_double_(pos + 4) = gait_params_.swing_duration[i];
+                    ob_double_(pos + 8) = gait_params_.phase_time_left[i];
+                    ob_double_(pos + 12) = gait_params_.desired_contact_states[i];
+                    ob_double_(pos + 16) = gait_params_.foot_target[i];
+                    ob_double_(pos + 20) = gait_params_.foot_position[i];
+                    pos++;
+                }
+                pos += 20;
+
+                if(step_ % buffer_stride_ == 0) {
+                    step_ = 0;
+                    Eigen::VectorXd temp;
+
+                    // joint position error history
+                    temp.setZero((buffer_length_ - 1) * num_joints_);
+                    // TODO: Finish filling in buffer
+
+                    // joint velocity history
+
+                    // body velocity error history
+                }
+                step_++;
+            }
 
             std::mt19937 rand_num_gen_;
             std::normal_distribution<double> distribution_;
@@ -213,14 +452,19 @@ namespace gym_ignition {
                             err_prev_,
                             err_int_;
 
+            Eigen::Vector3d target_velocity_,
+                            body_linear_vel_,
+                            body_angular_vel_;
+
             int num_joints_;
 
             std::vector<double> initial_joint_positions_,
                                 initial_joint_velocities_;
 
-            int buffer_length_ = 1, step = -1;
+            int buffer_length_ = 1,
+                step = -1;
 
-            double  nominal_body_height_, 
+            double  body_height_, 
                     body_height_target_,
                     gait_freq_;
 
@@ -238,7 +482,7 @@ namespace gym_ignition {
                 bool is_stance_gait = false;
                 std::array<bool, 4> foot_contact_states = {true, true, true, true};
                 std::array<bool, 4> desired_contact_states = {true, true, true, true};
-                std::string ee_frame_names[4] = {"front_left_foot", "front_right_foot", "rear_left_foot", "rear_right_foot"};
+                std::string ee_frame_names[4] = {"front_left_ee", "front_right_ee", "rear_left_ee", "rear_right_ee"};
             };
 
             GaitParams  gait_params_,
