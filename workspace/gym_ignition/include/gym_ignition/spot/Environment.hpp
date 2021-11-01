@@ -416,13 +416,30 @@ namespace gym_ignition {
 
                     // joint position error history
                     temp.setZero((buffer_length_ - 1) * num_joints_);
-                    // TODO: Finish filling in buffer
+                    temp = ob_double_.segment(pos + num_joints_, num_joints_);
+                    ob_double_.segment(pos + num_joints_, num_joints_) = p_target_.tail(num_joints_) - gc.tail(num_joints_);
+                    ob_double_.segment(pos, num_joints_ * (buffer_length_ - 1)) = temp;
+                    pos += num_joints_ * buffer_length_;
 
                     // joint velocity history
+                    temp = ob_double_.segment(pos + num_joints_, num_joints_ * (buffer_length_ - 1));
+                    ob_double_.segment(pos + num_joints_ * (buffer_length_ - 1), num_joints_) = gv.tail(num_joints_);
+                    ob_double_.segment(pos, num_joints_ * (buffer_length_ - 1)) = temp;
+                    pos += num_joints_ * buffer_length_;
 
                     // body velocity error history
+                    temp.setZero(3 * (buffer_length_ - 1));
+                    temp = ob_double_.segment(pos + 3, 3 * (buffer_length_ - 1));
+
+                    Eigen::Vector3d body_vel_err = target_velocity_ - body_linear_vel_;
+                    body_vel_err(2) = target_velocity_(2) - body_angular_vel_(2);
+                    ob_double_.segment(pos + 3 * (buffer_length_ - 1), 3) = body_vel_err;
+                    ob_double_.segment(pos, 3 * (buffer_length_ - 1)) = temp;
+                    pos += 3 * buffer_length_;
                 }
                 step_++;
+
+                ob_scaled_ = (ob_double_ - ob_mean_).cwiseQuotient(ob_std_);
             }
 
             std::mt19937 rand_num_gen_;
