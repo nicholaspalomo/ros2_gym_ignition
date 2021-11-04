@@ -30,7 +30,7 @@ namespace gym_ignition {
 
                 world_->insertWorld(get_cwd() + "install/gym_ignition_description/share/gym_ignition_description/worlds/empty.world", "empty" + std::to_string(env_index));
 
-                                // Insert ground plane
+                // Insert ground plane
                 world_->insertGround(get_cwd() + "install/gym_ignition_description/share/gym_ignition_description/gym_ignition_models/ground_plane/ground_plane.sdf", "ground" + std::to_string(env_index), /*enable contacts=*/true);
 
                 // Open the GUI, if you enabled visualizing the training when launching the simulation
@@ -38,11 +38,11 @@ namespace gym_ignition {
                     world_->openGazeboGui(5);
 
                 spot_ = world_->insertRobot(
-                get_cwd() + "install/gym_ignition_description/share/gym_ignition_description/gym_ignition_models/spot/spot.urdf",
-                "spot" + std::to_string(env_index),
-                MODEL::readJointSerializationFromYaml(cfg["joint_serialization"]),
-                "floating",
-                "torso");
+                    get_cwd() + "install/gym_ignition_description/share/gym_ignition_description/gym_ignition_models/spot/spot.urdf",
+                    "spot" + std::to_string(env_index),
+                    MODEL::readJointSerializationFromYaml(cfg["joint_serialization"]),
+                    "floating",
+                    "torso");
 
                 num_joints_ = spot_->numJoints();
 
